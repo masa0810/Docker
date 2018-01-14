@@ -3,7 +3,7 @@ FROM nvidia/cuda:9.1-cudnn7-devel
 # Install dependencies
 RUN set -x && \
     apt-get -qq update && \
-    apt-get -qq upgrade && \
+    apt-get -qq -y upgrade && \
     apt-get -qq -y install git && \
     apt-get -qq -y install libicu-dev libbz2-dev zlib1g-dev liblzma-dev
 
