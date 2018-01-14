@@ -10,8 +10,10 @@ RUN set -x && \
 # Boost Build
 RUN set -x && \
     cd /tmp/ && \
-    git clone --recursive https://github.com/boostorg/boost.git -b boost-1.66.0 && \
+    git clone https://github.com/boostorg/boost.git && \
     cd boost/ && \
+    git checkout -b boost-1.66.0 && \
+    git submodule update --init --recursive && \
     ./bootstrap.sh && \
     ./b2 -j`grep processor /proc/cpuinfo | wc -l` cxxflags="-std=c++14" linkflags="-std=c++14" install
 
