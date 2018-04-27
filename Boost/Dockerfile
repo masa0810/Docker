@@ -1,26 +1,32 @@
-FROM nvidia/cuda:9.1-cudnn7-devel
+FROM hub.islab.secom.corp/arg/docker/devel:base
 
-# Install dependencies
+# 更新
 RUN set -x && \
     apt-get -qq update && \
-    apt-get -qq -y upgrade && \
-    apt-get -qq -y install git && \
-    apt-get -qq -y install libicu-dev libbz2-dev zlib1g-dev liblzma-dev
+    apt-get -qq -y upgrade
 
-# Boost Build
+# Boost インストール
 RUN set -x && \
+    apt-get -qq -y install \
+        libbz2-dev \
+        liblzma-dev \
+        zlib1g-dev \
+        libicu-dev && \
     cd /tmp/ && \
-    git clone https://github.com/boostorg/boost.git && \
+    git clone -b build https://git.islab.secom.corp/LibraryMirror/boost.git && \
     cd boost/ && \
-    git checkout -b boost-1.66.0 && \
-    git submodule update --init --recursive && \
-    ./bootstrap.sh && \
-    ./b2 -j`grep processor /proc/cpuinfo | wc -l` cxxflags="-std=c++14" linkflags="-std=c++14" install
+    ./bootstrap.sh --with-icu && \
+    ./b2 -j`nproc` link=shared runtime-link=shared threading=multi variant=release --without-python install && \
+    apt-get -qq -y purge \
+        libbz2-dev \
+        liblzma-dev \
+        zlib1g-dev \
+        libicu-dev
 
 # Clearn up
 RUN set -x && \
     cd ~/ && \
-    apt-get -qq -y purge git && \
+    apt-get -qq -y autoremove && \
     apt-get -qq -y autoclean && \
     apt-get -qq -y clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
